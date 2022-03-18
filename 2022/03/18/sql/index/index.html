@@ -1,0 +1,316 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>单表数据量大一定要分库分表吗？ | Macky's Blog</title><meta name="keywords" content="分库分表,大数据分库分表"><meta name="author" content="Macky.He"><meta name="copyright" content="Macky.He"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1. 概述 在业务发展初期单表完全可以满足业务需求，在阿里巴巴开发手册也建议：单表行数超过500万行或者单表容量超过2GB才推荐进行分库分表，如果预计三年后数据量根本达不到这个级别，请不要在创建表时就分库分表。 但是随着业务的发展和深入，单表数据量不断增加，逐渐成为业务系统的瓶颈。这是为什么呢？ 从宏观层面分析任何物体都必然有其物理极限。1965年英特尔创始人摩尔预测：集成电路上可容纳的元器件的数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单表数据量大一定要分库分表吗？">
+<meta property="og:url" content="https://www.macky.cn/2022/03/18/sql/index/index.html">
+<meta property="og:site_name" content="Macky&#39;s Blog">
+<meta property="og:description" content="1. 概述 在业务发展初期单表完全可以满足业务需求，在阿里巴巴开发手册也建议：单表行数超过500万行或者单表容量超过2GB才推荐进行分库分表，如果预计三年后数据量根本达不到这个级别，请不要在创建表时就分库分表。 但是随着业务的发展和深入，单表数据量不断增加，逐渐成为业务系统的瓶颈。这是为什么呢？ 从宏观层面分析任何物体都必然有其物理极限。1965年英特尔创始人摩尔预测：集成电路上可容纳的元器件的数">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://r733qez20.hd-bkt.clouddn.com/background/f12420a5857be1aeebef35943a0d106f.gif">
+<meta property="article:published_time" content="2022-03-18T09:36:41.986Z">
+<meta property="article:modified_time" content="2022-03-18T09:36:41.990Z">
+<meta property="article:author" content="Macky.He">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://r733qez20.hd-bkt.clouddn.com/background/f12420a5857be1aeebef35943a0d106f.gif"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://www.macky.cn/2022/03/18/sql/index/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":50},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Macky.He","link":"链接: ","source":"来源: Macky's Blog","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '单表数据量大一定要分库分表吗？',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-03-18 17:36:41'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="http://img.macky.cn/avator/avator.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('http://r733qez20.hd-bkt.clouddn.com/background/f12420a5857be1aeebef35943a0d106f.gif')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Macky's Blog</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">单表数据量大一定要分库分表吗？</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2022-03-18T09:36:41.986Z" title="发表于 2022-03-18 17:36:41">2022-03-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%9E%B6%E6%9E%84/">架构</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="单表数据量大一定要分库分表吗？"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="1-概述">1. 概述</h2>
+<p>在业务发展初期单表完全可以满足业务需求，在阿里巴巴开发手册也建议：单表行数超过500万行或者单表容量超过2GB才推荐进行分库分表，如果预计三年后数据量根本达不到这个级别，请不要在创建表时就分库分表。</p>
+<p>但是随着业务的发展和深入，单表数据量不断增加，逐渐成为业务系统的瓶颈。这是为什么呢？</p>
+<p>从宏观层面分析任何物体都必然有其物理极限。1965年英特尔创始人摩尔预测：集成电路上可容纳的元器件的数目，约每隔24个月增加一倍，性能提升一倍，即计算机性能每两年翻一番。</p>
+<p>但是摩尔定律会有终点吗？有些科学家认为摩尔定律是有终点的：半导体芯片单位面积可集成的元件数量是有极限的，因为半导体芯片制程工艺的物理极限为2到3纳米。当然也有科学家不支持这种说法，但是我们可以从中看出物理极限是很难突破的，当单表数据量达到一定规模时必然也达到极限。</p>
+<p>从细节层面分析我们将数据保存在数据库，实际上是保存在磁盘中，一次磁盘IO操作需要经历寻道、旋转延时、数据传输三个步骤，那么一次磁盘IO耗时公式如下：</p>
+<blockquote>
+<p>单次IO时间 = 寻道时间 + 旋转延迟 + 传送时间</p>
+</blockquote>
+<p>总体来说上述操作都较为耗时，速度和内存相比有着数量级的差距，当数据量过大磁盘这一瓶颈更加明显。那么应该怎么办？处理单表数据量过大有以下六字口诀：删、换、分、拆、异、热。</p>
+<p><img src="http://img.macky.cn/content/2022-03-18/1.jpg" alt="img"></p>
+<p>删是指删除历史数据并进行归档。换是指不要只使用数据库资源，有些数据可以存储至其它替代资源。分是指读写分离，增加多个读实例应对读多写少的互联网场景。拆是指分库分表，将数据分散至不同的库表中减轻压力。异指数据异构，将一份数据根据不同业务需求保存多份。热是指热点数据，这是一个非常值得注意的问题。</p>
+<h2 id="2-删">2. 删</h2>
+<p>我们分析这样一个场景：消费者会经常查询一年之前的订单记录吗？答案是一般不会，或者说这种查询需求量很小。根据上述分析那么一年前的数据我们就没有必要放在单表这张业务主表，可以将一年前的数据迁移到历史归档表。</p>
+<p><img src="http://img.macky.cn/content/2022-03-18/2.jpg" alt="img"></p>
+<p>在查询历史数据表时，可以限制查询条件如必须选择日期范围，日期范围不能超过X个月等等从而减轻查询压力。</p>
+<p>处理历史存量数据比较简单，因为存量数据一般是静态的，此时状态已经不再改变了。数据处理一般分为以下两个步骤：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(1) 迁移一年前数据至历史归档表</span><br><span class="line">(2) 根据主键分批删除主表数据</span><br></pre></td></tr></table></figure>
+<p>不能一次性删除所有数据，因为数据量太大可能会引发超时，而是应该根据ID分批删除，例如每次删除500条数据。</p>
+<p>第一步查询一年前主键最大值和最小值，这是我们需要删除的数据范围：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line"><span class="built_in">MIN</span>(id) <span class="keyword">AS</span> minId, </span><br><span class="line"><span class="built_in">MAX</span>(id) <span class="keyword">AS</span> maxId </span><br><span class="line"><span class="keyword">FROM</span> biz_table </span><br><span class="line"><span class="keyword">WHERE</span> create_time <span class="operator">&lt;</span> DATE_SUB(now(),<span class="type">INTERVAL</span> <span class="number">1</span> <span class="keyword">YEAR</span>)</span><br></pre></td></tr></table></figure>
+<p>第二步删除数据时不能一次性全部删掉，因为很可能会超时，我们可以通过代码动态更新endId进行批量删除：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> biz_table </span><br><span class="line"><span class="keyword">WHERE</span> id <span class="operator">&gt;=</span> #&#123;minId&#125;</span><br><span class="line"><span class="keyword">AND</span> id <span class="operator">&lt;=</span> #&#123;maxId&#125;</span><br><span class="line"><span class="keyword">AND</span> id <span class="operator">&lt;=</span> #&#123;endId&#125;</span><br><span class="line">LIMIT <span class="number">500</span></span><br></pre></td></tr></table></figure>
+<h2 id="3-换">3. 换</h2>
+<p>换是指换一个存储介质，当然并不是说完全替换，而是用其它存储介质对数据库做一个补充。例如海量流水记录，这类数据量级是巨量的，根本不适合存储在MySQL数据库中，那么这些数据可以存在哪里呢？</p>
+<p>现在互联网公司一般都具备与之规模相对应的大数据服务或者平台，那么作为业务开发者要善于应用公司大数据能力，减轻业务数据库压力。</p>
+<h3 id="3-1-消息队列">3.1. 消息队列</h3>
+<p>这些海量数据可以存储至Kafka，因为其本质上就是分布式的流数据存储系统。使用Kafka有如下优点：</p>
+<p>第一个优点是Kafka社区活跃功能强大，已经成为了一种事实上的工业标准。大数据很多组件都提供了Kafka接入组件，经过生产验证并且对接成本较小，可以为下游业务提供更多选择。</p>
+<p>第二个优点是Kafka具有消息队列本身的优点例如解耦、异步和削峰。</p>
+<p><img src="http://img.macky.cn/content/2022-03-18/3.png" alt="img"></p>
+<p>假设这些海量数据都已经存储在Kafka，现在我们希望这些数据可以产生业务价值，这涉及到两种数据分析任务：离线任务和实时任务。</p>
+<p>离线任务对实时性要求不高，例如每天、每周、每月的数据报表统计分析，我们可以使用基于MapReduce数据仓库工具Hive进行报表统计。</p>
+<p>实时任务对实时性要求高，例如根据用户相关行为推荐用户感兴趣的商品，提高用户购买体验和效率，可以使用Flink进行流处理分析。例如运营后台查询分析，可以将数据同步至ES进行检索。</p>
+<p>还有一种分类方式是将任务分为批处理任务和流处理任务，我们可以这么理解：离线任务一般使用批处理技术，实时任务一般使用流处理技术。</p>
+<h3 id="3-2-API">3.2. API</h3>
+<p>上一个章节我们使用了Kafka进行海量数据存储，由于其强大兼容性和集成度，可以作为数据中介将数据进行中转和解耦。</p>
+<p>当然我们并不是必须使用Kafka进行中转，例如我们直接可以使用相关Java API将数据存入Hive、ES、HBASE等。</p>
+<p>但是我并不推荐这种做法，因为将保存流水这样操作耦合进业务代码并不合适，违反了高内聚低耦合的原则，尽量不要使用。</p>
+<h3 id="3-3-缓存">3.3. 缓存</h3>
+<p>从广义上理解换这个字，我们还可以引入Redis远程缓存，把Redis放在MySQL前面，拦下一些高频读请求，但是要注意缓存穿透和击穿问题。</p>
+<p>缓存穿透和击穿从最终结果上来说都是流量绕过缓存打到了数据库，可能会导致数据库挂掉或者系统雪崩，但是仔细区分还是有一些不同，我们分析一张业务读取缓存一般流程图。</p>
+<p><img src="http://img.macky.cn/content/2022-03-18/4.jpg" alt="img"></p>
+<p>我们用文字简要描述这张图：</p>
+<p>(1) 业务查询数据时首先查询缓存，如果缓存存在数据则返回，流程结束<br>
+(2) 如果缓存不存在数据则查询数据库，如果数据库不存在数据则返回空数据，流程结束<br>
+(3) 如果数据库存在数据则将数据写入缓存并返回数据给业务，流程结束<br>
+假设业务方要查询A数据，缓存穿透是指数据库根本不存在A数据，所以根本没有数据可以写入缓存，导致缓存层失去意义，大量请求会频繁访问数据库。</p>
+<p>缓存击穿是指请求在查询数据库前，首先查缓存看看是否存在，这是没有问题的。但是并发量太大，导致第一个请求还没有来得及将数据写入缓存，后续大量请求已经开始访问缓存，这是数据在缓存中还是不存在的，所以瞬时大量请求会打到数据库。</p>
+<p>我们可以使用分布式锁加上自旋解决这个问题，本文给出一段示例代码，具体原理和代码实现请参看我之前的文章：流程图+源码深入分析：缓存穿透和击穿问题原理以及解决方案</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 业务回调</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> 今日头条号「JAVA前线」</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">RedisBizCall</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 业务回调方法</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 序列化后数据值</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    String <span class="title function_">call</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 安全缓存管理器</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> 今天头条号「JAVA前线」</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SafeRedisManager</span> &#123;</span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> RedisClient RedisClient;</span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> RedisLockManager redisLockManager;</span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">getDataSafe</span><span class="params">(String key, <span class="type">int</span> lockExpireSeconds, <span class="type">int</span> dataExpireSeconds, RedisBizCall bizCall, <span class="type">boolean</span> alwaysRetry)</span> &#123;</span><br><span class="line">        <span class="type">boolean</span> <span class="variable">getLockSuccess</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">                <span class="type">String</span> <span class="variable">value</span> <span class="operator">=</span> redisClient.get(key);</span><br><span class="line">                <span class="keyword">if</span> (StringUtils.isNotEmpty(value)) &#123;</span><br><span class="line">                    <span class="keyword">return</span> value;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">/** 竞争分布式锁 **/</span></span><br><span class="line">                <span class="keyword">if</span> (getLockSuccess = redisLockManager.tryLock(key, lockExpireSeconds)) &#123;</span><br><span class="line">                    value = redisClient.get(key);</span><br><span class="line">                    <span class="keyword">if</span> (StringUtils.isNotEmpty(value)) &#123;</span><br><span class="line">                        <span class="keyword">return</span> value;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">/** 查询数据库 **/</span></span><br><span class="line">                    value = bizCall.call();</span><br><span class="line">                    <span class="comment">/** 数据库无数据则返回**/</span></span><br><span class="line">                    <span class="keyword">if</span> (StringUtils.isEmpty(value)) &#123;</span><br><span class="line">                        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">/** 数据存入缓存 **/</span></span><br><span class="line">                    redisClient.setex(key, dataExpireSeconds, value);</span><br><span class="line">                    <span class="keyword">return</span> value;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">if</span> (!alwaysRetry) &#123;</span><br><span class="line">                        logger.warn(<span class="string">&quot;竞争分布式锁失败,key=&#123;&#125;&quot;</span>, key);</span><br><span class="line">                        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    Thread.sleep(<span class="number">100L</span>);</span><br><span class="line">                    logger.warn(<span class="string">&quot;尝试重新获取数据,key=&#123;&#125;&quot;</span>, key);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">            logger.error(<span class="string">&quot;getDistributeSafeError&quot;</span>, ex);</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (getLockSuccess) &#123;</span><br><span class="line">                redisLockManager.unLock(key);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="4-分">4. 分</h2>
+<p>我们首先看一个概念：读写比。互联网场景中一般是读多写少，例如浏览20次订单列表信息才会进行1次确认收货，此时读写比例就是20:1。面对读多写少这种情况我们可以做什么呢？</p>
+<p>我们可以部署多台MySQL读库专门用来接收读请求，主库接收写请求并通过binlog实时同步的方式将数据同步至读库。MySQL官方即提供这种能力，进行简单配置即可。</p>
+<p><img src="http://img.macky.cn/content/2022-03-18/5.png" alt="img"></p>
+<p>那么客户端怎么知道访问读库还是写库呢？推荐使用ShardingSphere组件，通过配置将读写请求分别路由至读库或者写库。</p>
+<h2 id="5-拆">5. 拆</h2>
+<p>如果删除了历史数据并采用了其它存储介质，也用了读写分离，但是单表压力还是太大怎么办？这时我们只能拆分数据表，即把单库单表数据迁移到多库多张表中。</p>
+<p>假设有一个电商数据库存放订单、商品、支付三张业务表。随着业务量越来越大，这三张业务数据表也越来越大，我们就以这个例子进行分析。</p>
+<h3 id="5-1-垂直拆分">5.1. 垂直拆分</h3>
+<p>垂直拆分就是按照业务拆分，我们将电商数据库拆分成三个库，订单库、商品库。支付库，订单表在订单库，商品表在商品库，支付表在支付库。这样每个库只需要存储本业务数据，物理隔离不会互相影响。</p>
+<p><img src="http://img.macky.cn/content/2022-03-18/6.png" alt="img"></p>
+<h3 id="5-2-水平拆分">5.2. 水平拆分</h3>
+<p>按照垂直拆分方案，现在我们已经有三个库了，平稳运行了一段时间。但是随着业务增长，每个单库单表的数据量也越来越大，逐渐到达瓶颈。</p>
+<p>这时我们就要对数据表进行水平拆分，所谓水平拆分就是根据某种规则将单库单表数据分散到多库多表，从而减小单库单表的压力。</p>
+<p>水平拆分策略有很多方案，最重要的一点是选好ShardingKey，也就是按照哪一列进行拆分，怎么分取决于我们访问数据的方式。</p>
+<h4 id="5-2-1-范围分片">5.2.1. 范围分片</h4>
+<p>现在我们要对订单库进行水平拆分，我们选择的ShardingKey是订单创建时间，拆分策略如下：</p>
+<p>(1) 拆分为四个数据库，分别存储每个季度的数据<br>
+(2) 每个库三张表，分别存储每个月的数据<br>
+上述方法优点是对范围查询比较友好，例如我们需要统计第一季度的相关数据，查询条件直接输入时间范围即可。</p>
+<p><img src="http://img.macky.cn/content/2022-03-18/5.2.1.png" alt="img"></p>
+<p>但是这个方案问题是容易产生热点数据。例如双11当天下单量特别大，就会导致11月这张表数据量特别大从而造成访问压力。</p>
+<h4 id="5-2-2-查表分片">5.2.2. 查表分片</h4>
+<p>查表法是根据一张路由表决定ShardingKey路由到哪一张表，每次路由时首先到路由表里查到分片信息，再到这个分片去取数据。</p>
+<p>我们分析一个查表法实际案例。Redis官方在3.0版本之后提供了集群方案Redis Cluster，其中引入了哈希槽（slot）这个概念。</p>
+<p>一个集群固定有16384个槽，在集群初始化时这些槽会平均分配到Redis集群节点上。每个key请求最终落到哪个槽计算公式是固定的：</p>
+<blockquote>
+<p>SLOT = CRC16(key) mod 16384</p>
+</blockquote>
+<p>那么问题来了：一个key请求过来怎么知道去哪台Redis节点获取数据？这就要用到查表法思想。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(1) 客户端连接任意一台Redis节点，假设随机访问到为节点A</span><br><span class="line">(2) 节点A根据key计算出slot值</span><br><span class="line">(3) 每个节点都维护着slot和节点映射关系表</span><br><span class="line">(4) 如果节点A查表发现该slot在本节点则直接返回数据给客户端</span><br><span class="line">(5) 如果节点A查表发现该slot不在本节点则返回给客户端一个重定向命令，告诉客户端应该去哪个节点上请求这个key的数据</span><br><span class="line">(6) 客户端再向正确节点发起连接请求</span><br></pre></td></tr></table></figure>
+<p>查表法优点是可以灵活制定路由策略，如果我们发现有的分片已经成为热点则修改路由策略。缺点是多一次查询路由表操作增加耗时，而且路由表如果是单点也可能会有单点问题。</p>
+<h4 id="5-2-3-哈希分片">5.2.3. 哈希分片</h4>
+<p>现在比较流行的分片方法是哈希分片，相较于范围分片，哈希分片可以较为均匀将数据分散在数据库中。</p>
+<p>我们现在将订单库拆分为4个库编号为[0,3]，每个库4张表编号为[0,3]，如下图如所示：</p>
+<p><img src="http://img.macky.cn/content/2022-03-18/5.2.3.png" alt="img"></p>
+<p>现在使用orderId作为ShardingKey，那么orderId=100的订单会保存在哪张表？我们来计算一下：由于是分库分表，首先确定路由到哪一个库，取模计算得到序号为0表示路由到db[0]</p>
+<blockquote>
+<p>db_index = 100 % 4 = 0</p>
+</blockquote>
+<p>库确定了接着在db[0]进行取模表路由</p>
+<blockquote>
+<p>table_index = 100 % 4 = 0</p>
+</blockquote>
+<p>最终这条数据应该路由至下表</p>
+<blockquote>
+<p>db[0]_table[0]</p>
+</blockquote>
+<p>最终计算结果如下图所示：</p>
+<p><img src="http://img.macky.cn/content/2022-03-18/5.2.3-1.png" alt="img"></p>
+<p>在实际开发中最终路由到哪张表，并不需要我们自己算，因为有许多开源框架就可以完成路由功能，例如ShardingSphere、TDDL等等。</p>
+<h2 id="6-异">6. 异</h2>
+<p>现在数据已经使用哈希分片方法完成了水平拆分，我们选择的ShardingKey是orderId。这时客户端需要查询orderId=111的数据，查询语句很简单如下：</p>
+<blockquote>
+<p>SELECT * FROM order WHERE orderId = 111</p>
+</blockquote>
+<p>这个语句没有问题，因为查询条件包含orderId，可以路由到具体的数据表。</p>
+<p>现在如果业务想要查询用户维度的数据，希望查询userId=222的数据，现在问题来了：以下这个语句可以查出数据吗？</p>
+<blockquote>
+<p>SELECT * FROM order WHERE userId = 222</p>
+</blockquote>
+<p>答案是可以，但是需要扫描所有库的所有表，因为无法根据userId路由到具体某一张表，这样时间成本会非常高，这种场景怎么办呢？</p>
+<p>这就要用到数据异构的思想。数据异构核心是用空间换时间，简单一句话就是一份数据按照不同业务需求保存多份，这样做是因为存储硬件成本不是很高，而互联网场景对响应速度要求很高。</p>
+<p>对于上述需要使用userId进行查询的场景，我们完全可以新建库和表，数量和结构与订单库表完全一致，唯一不同点是ShardingKey改用userId，这样就可以使用userId查询了。</p>
+<p>现在又引出一个新问题，业务不可能每次都将数据写入多个数据源，这样会带来性能问题和数据一致行为。怎么解决老库和新库数据同步问题？我们可以使用阿里开源的canal组件解决这个问题，看一张官网介绍canal架构图：</p>
+<p><img src="http://img.macky.cn/content/2022-03-18/6-1.png" alt="img"></p>
+<p>canal组件的主要用途是基于MySQL数据库增量日志解析，提供增量数据订阅和消费服务，工作原理如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(1) canal伪装成为MySQL slave模拟交互协议向master发送dump协议</span><br><span class="line">(2) master收到canal发送的dump请求，开始推送binlog给canal</span><br><span class="line">(3) canal解析binlog并发送到存储目的地，例如MySQL、Kafka、Elasticsearch</span><br></pre></td></tr></table></figure>
+<p>canal组件下游可以对接很多其它数据源，这样给业务提供了更多选择。我们可以像上述实例中新建用户维度订单表，也可以将数据存在ES中提供运营检索能力等等。</p>
+<h2 id="7-热">7. 热</h2>
+<p>我们来分析这样一个场景：社交业务有一张用户关系表，主要记录谁关注了谁。其中有一个明星粉丝特别多，如果以userId作为分片，那么其所在分片数据量就会特别大。</p>
+<p>不仅分片数据量特别大，而且可以预见这个分片访问频率也会非常高。此时数据量大并且访问频繁，很有可能造成系统压力。</p>
+<h3 id="7-1-热点概念">7.1. 热点概念</h3>
+<p>我们将访问行为称为热点行为，将访问对应的数据称为热点数据。我们通过实例来分析。</p>
+<p>在电商双11活动中百分之八十的访问量会集中在百分之二十的商品上。用户刷新、添加购物车、下单被称为热点行为，相应商品数据就被称为热点数据。</p>
+<p>在微博场景中大V发布一条消息会获得大量访问。用户对这条消息的浏览. 点赞、转发、评论被称为热点行为，这条消息数据被称为热点数据。</p>
+<p>在秒杀场景中参与秒杀的商品会获得极大的瞬时访问量。用户对这个商品的频繁刷新、点击、下单被称为热点行为，参与秒杀的商品数据被称为热点数据。</p>
+<p>我们必须将热点数据进行一些处理，使得热点访问更加流畅，更是为了保护系统免于崩溃。我们从发现热点数据、处理热点数据来展开分析。</p>
+<h3 id="7-2-发现热点数据">7.2. 发现热点数据</h3>
+<p>我们把发现热点数据分为两种方式：静态发现和动态发现。</p>
+<p>静态发现：在开始秒杀活动之前，参与商家一定知道哪些商品参与秒杀，那么他们可以提前将这些商品报备告知平台。</p>
+<p>在微博场景中，具有影响力的大V一般都很知名，网站运营同学可以提前知道。技术同学还可以通过分析历史数据找出TOP N数据。对于这些可以提前预判的数据，完全可以通过后台系统上报，这样系统可以提前做出预处理。</p>
+<p>动态发现：有些商品可能并没有上报为热点商品，但是在实际销售中却非常抢手。在微博场景中，有些话题热度突然升温。这些数据成为事实上的热点数据。对于这些无法提前预判的数据，需要动态进行判断。</p>
+<p>我们需要一个热点发现系统去主动发现热点数据。大体思路是首先异步收集访问日志，再统计单位时间内访问频次，当超过一定阈值时可以判断为热点数据。</p>
+<h3 id="7-3-处理热点问题">7.3. 处理热点问题</h3>
+<p>(1) 热点行为</p>
+<p>热点行为可以采取高频检测方式，如果发现频率过高则进行限制。或者采用内存队列实现的生产者与消费者这种异步化方式，消费者根据能力处理请求。</p>
+<p>(2) 热点数据</p>
+<p>处理热点数据核心主要是根据业务形态来进行处理，我一般采用以下方案配合执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(1) 选择合适ShardingKey进行分库分表</span><br><span class="line">(2) 异构数据至其它适合检索的数据源例如ES</span><br><span class="line">(3) 在MySQL之前设置缓存层</span><br><span class="line">(4) 尽量不在MySQL进行耗时操作（例如聚合）</span><br></pre></td></tr></table></figure>
+<h2 id="8-文章总结">8. 文章总结</h2>
+<p>本文我们详细介绍处理单表数据量过大的六字口诀：删、换、分、拆、异、热。这并不是意味这每次遇到单表数据量过大情况六种方案全部都要使用，例如拆分数据表成本确实比较高，会带来分布式事务、数据难以聚合等问题，如果不分表可以解决那么就不要分表，核心还是根据自身业务情况选择合适的方案。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="http://r733qez20.hd-bkt.clouddn.com/background/f12420a5857be1aeebef35943a0d106f.gif" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/03/18/openFeign/index/"><img class="next-cover" src="http://r733qez20.hd-bkt.clouddn.com/background/f12420a5857be1aeebef35943a0d106f.gif" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">OpenFeign调用详解[Spring Cloud Hoxton.SR*版本]</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="http://img.macky.cn/avator/avator.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Macky.He</div><div class="author-info__description"></div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">1. 概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%88%A0"><span class="toc-number">2.</span> <span class="toc-text">2. 删</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%8D%A2"><span class="toc-number">3.</span> <span class="toc-text">3. 换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="toc-number">3.1.</span> <span class="toc-text">3.1. 消息队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-API"><span class="toc-number">3.2.</span> <span class="toc-text">3.2. API</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E7%BC%93%E5%AD%98"><span class="toc-number">3.3.</span> <span class="toc-text">3.3. 缓存</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%88%86"><span class="toc-number">4.</span> <span class="toc-text">4. 分</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E6%8B%86"><span class="toc-number">5.</span> <span class="toc-text">5. 拆</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%9E%82%E7%9B%B4%E6%8B%86%E5%88%86"><span class="toc-number">5.1.</span> <span class="toc-text">5.1. 垂直拆分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E6%B0%B4%E5%B9%B3%E6%8B%86%E5%88%86"><span class="toc-number">5.2.</span> <span class="toc-text">5.2. 水平拆分</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-1-%E8%8C%83%E5%9B%B4%E5%88%86%E7%89%87"><span class="toc-number">5.2.1.</span> <span class="toc-text">5.2.1. 范围分片</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-2-%E6%9F%A5%E8%A1%A8%E5%88%86%E7%89%87"><span class="toc-number">5.2.2.</span> <span class="toc-text">5.2.2. 查表分片</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-3-%E5%93%88%E5%B8%8C%E5%88%86%E7%89%87"><span class="toc-number">5.2.3.</span> <span class="toc-text">5.2.3. 哈希分片</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%BC%82"><span class="toc-number">6.</span> <span class="toc-text">6. 异</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E7%83%AD"><span class="toc-number">7.</span> <span class="toc-text">7. 热</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-%E7%83%AD%E7%82%B9%E6%A6%82%E5%BF%B5"><span class="toc-number">7.1.</span> <span class="toc-text">7.1. 热点概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-%E5%8F%91%E7%8E%B0%E7%83%AD%E7%82%B9%E6%95%B0%E6%8D%AE"><span class="toc-number">7.2.</span> <span class="toc-text">7.2. 发现热点数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-3-%E5%A4%84%E7%90%86%E7%83%AD%E7%82%B9%E9%97%AE%E9%A2%98"><span class="toc-number">7.3.</span> <span class="toc-text">7.3. 处理热点问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93"><span class="toc-number">8.</span> <span class="toc-text">8. 文章总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/03/18/openFeign/index/" title="OpenFeign调用详解[Spring Cloud Hoxton.SR*版本]"><img src="http://r733qez20.hd-bkt.clouddn.com/background/f12420a5857be1aeebef35943a0d106f.gif" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="OpenFeign调用详解[Spring Cloud Hoxton.SR*版本]"/></a><div class="content"><a class="title" href="/2022/03/18/openFeign/index/" title="OpenFeign调用详解[Spring Cloud Hoxton.SR*版本]">OpenFeign调用详解[Spring Cloud Hoxton.SR*版本]</a><time datetime="2022-03-18T09:36:41.986Z" title="发表于 2022-03-18 17:36:41">2022-03-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/03/18/sql/index/" title="单表数据量大一定要分库分表吗？"><img src="http://r733qez20.hd-bkt.clouddn.com/background/f12420a5857be1aeebef35943a0d106f.gif" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="单表数据量大一定要分库分表吗？"/></a><div class="content"><a class="title" href="/2022/03/18/sql/index/" title="单表数据量大一定要分库分表吗？">单表数据量大一定要分库分表吗？</a><time datetime="2022-03-18T09:36:41.986Z" title="发表于 2022-03-18 17:36:41">2022-03-18</time></div></div></div></div></div></div></main><footer id="footer" style="background: linear-gradient(135deg, #E2B0FF 10%, #9F44D3 100%)"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By Macky.He</div><div class="footer_custom_text">人生如梦，往事如梦</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">本地搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: '4kJdpiVJk4OjmdowGRR9iq5J-9Nh9j0Va',
+      appKey: 'iq0VkWNAyh2fY0GHu1JWA20A',
+      avatar: 'monsterid',
+      serverURLs: 'https://4kjdpivj.lc-cn-e1-shared.com',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = false;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-show-text" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/click-show-text.min.js" data-mobile="false" data-text="富强,民主,文明,和谐,自由,平等,公正,法制,爱国,敬业,诚信,友善" data-fontsize="15px" data-random="false" async="async"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
